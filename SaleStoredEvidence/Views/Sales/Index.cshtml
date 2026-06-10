@@ -1,0 +1,113 @@
+﻿@model IEnumerable<SaleStoredEvidence.Models.Sale>
+
+@{
+    ViewData["Title"] = "Sales List";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<h2 class="mb-3">Sales List</h2>
+
+<div class="d-flex justify-content-end mb-2">
+    <a asp-action="Create" class="btn btn-primary btn-sm rounded-pill px-3">
+        + Create New Sale
+    </a>
+</div>
+
+<table class="table table-bordered table-hover align-middle">
+
+    <thead class="table-dark">
+        <tr>
+            <th>Image</th>
+            <th>Client Name</th>
+            <th>Mobile</th>
+            <th>Sale Date</th>
+            <th>Total Price</th>
+            <th>Payment</th>
+            <th>Paid</th>
+            <th>Properties</th>
+            <th width="150">Actions</th>
+        </tr>
+    </thead>
+
+    <tbody>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+
+
+                <td>
+                    <img src="@Url.Content(item.ClientImage)" width="80" />
+                </td>
+
+
+                <td>@item.ClientName</td>
+
+
+                <td>@item.MobileNo</td>
+
+
+                <td>@item.SaleDate.ToString("yyyy-MM-dd")</td>
+
+
+                <td>@item.TotalPrice</td>
+
+
+                <td>@item.PaymentMethod?.PaymentType</td>
+
+
+                <td>
+                    @if (item.IsPaid)
+                    {
+                        <span class="badge bg-success">Paid</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-danger">Unpaid</span>
+                    }
+                </td>
+
+
+                <td>
+                    <ul class="mb-0 ps-3">
+                        @foreach (var p in item.Properties)
+                        {
+                            <li>
+                                @p.PropertyType
+                                <span class="badge bg-light text-dark border ms-1">
+                                    @p.Location
+                                </span>
+                            </li>
+                        }
+                    </ul>
+                </td>
+
+
+                <td class="text-nowrap">
+
+                    <a asp-action="Edit"
+                       asp-route-id="@item.SalesId"
+                       class="btn btn-warning btn-sm">
+                        Edit
+                    </a>
+
+                    <form asp-action="Delete"
+                          method="post"
+                          class="d-inline"
+                          onsubmit="return confirm('Are you sure to delete this sale?');">
+
+                        <input type="hidden" name="id" value="@item.SalesId" />
+
+                        <button type="submit" class="btn btn-danger btn-sm">
+                            Delete
+                        </button>
+                    </form>
+
+                </td>
+
+            </tr>
+        }
+
+    </tbody>
+
+</table>

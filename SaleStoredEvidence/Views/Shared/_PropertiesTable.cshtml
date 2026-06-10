@@ -1,0 +1,47 @@
+﻿@model List<SaleStoredEvidence.Models.ViewModels.PropertyViewModel>
+
+<table id="PropertyTable" class="table table-bordered table-sm">
+    <thead>
+        <tr>
+            <th>Property Type</th>
+            <th>Location</th>
+            <th>Action</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        @if (Model != null && Model.Count > 0)
+        {
+            for (int i = 0; i < Model.Count; i++)
+            {
+                <tr>
+                    <td>
+                        <input type="hidden" name="Properties[@i].PropertyId" value="@Model[i].PropertyId" />
+
+                        <input type="text"
+                               name="Properties[@i].PropertyType"
+                               class="form-control"
+                               value="@Model[i].PropertyType" />
+                    </td>
+
+                    <td>
+                        <input type="text"
+                               name="Properties[@i].Location"
+                               class="form-control"
+                               value="@Model[i].Location" />
+                    </td>
+
+                    <td>
+                        <button onclick="DeleteItem(this)"
+                                class="btn btn-danger"
+                                type="button">
+                            Remove
+                        </button>
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<input type="hidden" id="hdnLastIndex" value="@(Model?.Count ?? 0)" />

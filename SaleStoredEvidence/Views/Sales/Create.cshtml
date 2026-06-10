@@ -1,0 +1,184 @@
+﻿@model SaleStoredEvidence.Models.ViewModels.SalesViewModel
+@using Microsoft.AspNetCore.Mvc.Rendering
+
+@{
+    ViewData["Title"] = "Create Sale";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<form id="createForm" asp-action="Create" method="post" enctype="multipart/form-data">
+    <div class="row">
+        <h1>Create Sale</h1>
+        <hr />
+
+        <div class="col-md-1"></div>
+
+        <!-- Master Info -->
+        <div class="col-md-6">
+            <h4>Master Info</h4>
+
+            <div asp-validation-summary="All" class="text-danger mb-3"></div>
+
+            <div class="form-group">
+                <label asp-for="SaleDate"></label>
+                <input asp-for="SaleDate" type="date" class="form-control" />
+                <span asp-validation-for="SaleDate" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="TotalPrice"></label>
+                <input asp-for="TotalPrice" class="form-control" />
+                <span asp-validation-for="TotalPrice" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="ClientName"></label>
+                <input asp-for="ClientName" class="form-control" />
+                <span asp-validation-for="ClientName" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="MobileNo"></label>
+                <input asp-for="MobileNo" class="form-control" />
+                <span asp-validation-for="MobileNo" class="text-danger"></span>
+            </div>
+            <div class="row align-items-center">
+                <div class="col-8">
+                    <div class="mb-3">
+                        <label asp-for="ProfileFile" class="form-label">Upload Image</label>
+
+                        <input asp-for="ProfileFile"
+                               type="file"
+                               class="form-control"
+                               onchange="readUrl(this)">
+                    </div>
+                </div>
+
+                <div class="col-4 text-center">
+                    <img id="imageFile"
+                         src="@(string.IsNullOrEmpty(Model.ClientImage) ? "/images/noImg.jpg" : Model.ClientImage)"
+                         alt="Preview"
+                         class="img-thumbnail"
+                         style="width:100px;height:100px;object-fit:cover;" />
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label asp-for="PaymentMethodId">Payment Method</label>
+                <select asp-for="PaymentMethodId"
+                        asp-items="@(new SelectList(Model.PaymentMethods, "PaymentMethodId", "PaymentType"))"
+                        class="form-control">
+                    <option value="0">Select Payment Method</option>
+                </select>
+                <span asp-validation-for="PaymentMethodId" class="text-danger"></span>
+            </div>
+
+            <div class="form-group form-check mt-2">
+                <input asp-for="IsPaid" class="form-check-input" />
+                <label asp-for="IsPaid" class="form-check-label"></label>
+            </div>
+
+            <div class="d-flex justify-content-end mt-3">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </div>
+
+        <!-- Details Info -->
+        <div class="col-md-5">
+            <h4>Details Info</h4>
+
+            <button onclick="AddProperty()"
+                    type="button"
+                    class="btn btn-success mb-2">
+                Add Property
+            </button>
+
+            <div id="propertiesContainer">
+                @Html.Partial("_PropertiesTable", Model.Properties)
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="row pb-5 mt-3">
+    <div class="d-flex justify-content-end">
+        <a asp-action="Index" class="btn btn-outline-secondary">
+            Back to List
+        </a>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        function AddProperty() {
+            var lastIndex = parseInt($("#hdnLastIndex").val());
+
+            var newRow = `
+                <tr>
+                    <td>
+                        <input type="hidden" name="Properties[${lastIndex}].PropertyId" value="0" />
+
+                        <input type="text"
+                               name="Properties[${lastIndex}].PropertyType"
+                               class="form-control" />
+                    </td>
+
+                    <td>
+                        <input type="text"
+                               name="Properties[${lastIndex}].Location"
+                               class="form-control" />
+                    </td>
+
+                    <td>
+                        <button onclick="DeleteItem(this)"
+                                class="btn btn-danger"
+                                type="button">
+                            Remove
+                        </button>
+                    </td>
+                </tr>
+            `;
+
+            $("#PropertyTable tbody").append(newRow);
+            $("#hdnLastIndex").val(lastIndex + 1);
+        }
+
+        function DeleteItem(btn) {
+            $(btn).closest("tr").remove();
+            ReIndexProperties();
+        }
+
+        function ReIndexProperties() {
+            $("#PropertyTable tbody tr").each(function (index) {
+                $(this).find("input").each(function () {
+                    var name = $(this).attr("name");
+
+                    if (name && name.includes("PropertyId")) {
+                        $(this).attr("name", `Properties[${index}].PropertyId`);
+                    }
+
+                    if (name && name.includes("PropertyType")) {
+                        $(this).attr("name", `Properties[${index}].PropertyType`);
+                    }
+
+                    if (name && name.includes("Location")) {
+                        $(this).attr("name", `Properties[${index}].Location`);
+                    }
+                });
+            });
+
+            $("#hdnLastIndex").val($("#PropertyTable tbody tr").length);
+        }
+                function readUrl(input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    $('#imageFile').attr('src', e.target.result);
+                }
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+}
